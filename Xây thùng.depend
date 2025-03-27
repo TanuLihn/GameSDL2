@@ -1,0 +1,38 @@
+# depslib dependency file v1.0
+1742811083 source:c:\code block\xây thùng\main.cpp
+	"game.h"
+	<iostream>
+
+1742812017 c:\code block\xây thùng\game.h
+	<SDL.h>
+	<iostream>
+
+1742811956 c:\code block\xây thùng\background.h
+	<SDL.h>
+	<SDL_image.h>
+
+1742813164 c:\code block\xây thùng\win_level.h
+
+1742345370 c:\code block\xây thùng\box.h
+	<SDL.h>
+
+1742344522 c:\code block\xây thùng\score.h
+
+1742344566 c:\code block\xây thùng\highscore.h
+	<vector>
+	<string>
+	<fstream>
+	<iostream>
+	<algorithm>
+
+1742813495 source:c:\code block\xây thùng\game.cpp
+	"game.h"
+	"win_level.h"
+
+1742811956 source:c:\code block\xây thùng\background.cpp
+	"background.h"
+	<iostream>
+
+1742813164 source:c:\code block\xây thùng\win_level.cpp
+	"win_level.h"
+
