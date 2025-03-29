@@ -2,23 +2,20 @@
 #define BOX_H
 
 #include <SDL.h>
+#include <SDL_image.h>
+#include <string>
 
 class Box {
 public:
-    Box(int x, int y, int size, SDL_Renderer* renderer);
-    void update();  // Cập nhật vị trí hộp
-    void render();  // Vẽ hộp lên màn hình
-    void drop();    // Khi nhấn SPACE, hộp sẽ rơi xuống
-    bool isFalling() const { return falling; }
-    int getX() const { return x; }
-    int getY() const { return y; }
+    Box(SDL_Renderer* renderer);
+    ~Box();
+
+    bool loadBoxTexture(const std::string& path);
+    void render(int x, int y, int size);
 
 private:
-    int x, y;              // Vị trí của hộp
-    int size;              // Kích thước hộp
-    SDL_Renderer* renderer; // Renderer để vẽ hộp
-    bool falling;          // Trạng thái rơi hay không
-    int velocityY;         // Tốc độ rơi
+    SDL_Renderer* renderer;
+    SDL_Texture* boxTexture;
 };
 
 #endif

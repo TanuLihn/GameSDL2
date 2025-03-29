@@ -15,6 +15,6 @@ bool checkGameOver(int grid[7][7]) {
         }
     }
 
-    return countFullColumns >= 2; // Thắng khi có ít nhất 2 cột đầy
+    return countFullColumns >= 1; // Thắng khi có ít nhất 2 cột đầy
 }
 

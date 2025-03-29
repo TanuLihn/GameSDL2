@@ -1,5 +1,5 @@
 #include "game.h"
-#include "win_level.h"
+#include <iostream>
 
 const int SCREEN_WIDTH = 600;
 const int SCREEN_HEIGHT = 700;
@@ -10,13 +10,12 @@ Game::Game() {
     renderer = nullptr;
     isRunning = false;
 
-    boxX = 0;         // Hộp bắt đầu từ cột đầu tiên
-    boxY = 0;         // Ở hàng trên cùng
-    boxSpeed = 10 * 3; // Tăng tốc độ nhanh hơn 1.5 lần
+    boxX = 0;
+    boxY = 0;
+    boxSpeed = 4 * 10;
     isFalling = false;
-    direction = true; // Di chuyển sang phải
+    direction = true;
 
-    // Khởi tạo lưới (0: trống, 1: hộp đã rơi)
     for (int i = 0; i < 7; i++)
         for (int j = 0; j < 7; j++)
             grid[i][j] = 0;
@@ -44,6 +43,13 @@ bool Game::init() {
         return false;
     }
 
+    background = new Background(renderer);
+    box = new Box(renderer);
+
+    if (!background->loadBackground("background.png") || !box->loadBoxTexture("box.png")) {
+        return false;
+    }
+
     isRunning = true;
     return true;
 }
@@ -53,7 +59,7 @@ void Game::run() {
         handleEvents();
         update();
         render();
-        SDL_Delay(16);  // Khoảng 60 FPS
+        SDL_Delay(16);
     }
 }
 
@@ -65,7 +71,7 @@ void Game::handleEvents() {
         }
         if (event.type == SDL_KEYDOWN) {
             if (event.key.keysym.sym == SDLK_SPACE && !isFalling) {
-                isFalling = true;  // Bắt đầu rơi khi nhấn Space
+                isFalling = true;
             }
         }
     }
@@ -73,7 +79,6 @@ void Game::handleEvents() {
 
 void Game::update() {
     if (!isFalling) {
-        // Di chuyển hộp qua lại
         if (direction) {
             boxX += boxSpeed;
             if (boxX + GRID_SIZE >= SCREEN_WIDTH) {
@@ -86,26 +91,16 @@ void Game::update() {
             }
         }
     } else {
-        // Xác định cột hiện tại của hộp
         int col = boxX / GRID_SIZE;
-
-        // Tìm hàng trống thấp nhất trong cột
         int row = 6;
         while (row >= 0 && grid[row][col] == 1) {
             row--;
         }
 
-        // Nếu tìm thấy vị trí hợp lệ, đặt hộp xuống
         if (row >= 0) {
             grid[row][col] = 1;
         }
 
-        // Kiểm tra điều kiện thắng
-        if (checkGameOver(grid)) {
-            isRunning = false;
-        }
-
-        // Reset hộp mới
         boxX = 0;
         isFalling = false;
     }
@@ -115,24 +110,20 @@ void Game::render() {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
 
-    // Vẽ lưới
+    background->render();
+
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     for (int i = 0; i <= 7; i++) {
         SDL_RenderDrawLine(renderer, i * GRID_SIZE, 0, i * GRID_SIZE, SCREEN_HEIGHT);
         SDL_RenderDrawLine(renderer, 0, i * GRID_SIZE, SCREEN_WIDTH, i * GRID_SIZE);
     }
 
-    // Vẽ hộp rơi
-    SDL_Rect box = {boxX, boxY, GRID_SIZE, GRID_SIZE};
-    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-    SDL_RenderFillRect(renderer, &box);
+    box->render(boxX, boxY, GRID_SIZE);
 
-    // Vẽ hộp đã rơi xuống
     for (int i = 0; i < 7; i++) {
         for (int j = 0; j < 7; j++) {
             if (grid[i][j] == 1) {
-                SDL_Rect fallenBox = {j * GRID_SIZE, i * GRID_SIZE, GRID_SIZE, GRID_SIZE};
-                SDL_RenderFillRect(renderer, &fallenBox);
+                box->render(j * GRID_SIZE, i * GRID_SIZE, GRID_SIZE);
             }
         }
     }
@@ -141,6 +132,8 @@ void Game::render() {
 }
 
 void Game::close() {
+    delete background;
+    delete box;
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();

@@ -1,43 +1,36 @@
 #include "box.h"
-#include <SDL_image.h>
+#include <iostream>
 
-Box::Box(int x, int y, int size, SDL_Renderer* renderer)
-    : x(x), y(y), size(size), renderer(renderer), falling(false), velocityY(0) {
-    // Load texture
-    SDL_Surface* surface = IMG_Load("box.png");
-    if (surface) {
-        texture = SDL_CreateTextureFromSurface(renderer, surface);
-        SDL_FreeSurface(surface);
-    } else {
-        texture = nullptr;
-    }
+Box::Box(SDL_Renderer* renderer) {
+    this->renderer = renderer;
+    boxTexture = nullptr;
 }
 
 Box::~Box() {
-    if (texture) {
-        SDL_DestroyTexture(texture);
-    }
+    SDL_DestroyTexture(boxTexture);
 }
 
-void Box::update() {
-    if (falling) {
-        y += velocityY;  // Cập nhật vị trí rơi xuống
-        velocityY += 1;  // Tăng tốc độ rơi (giống trọng lực)
+bool Box::loadBoxTexture(const std::string& path) {
+    SDL_Surface* loadedSurface = IMG_Load(path.c_str());
+    if (!loadedSurface) {
+        std::cerr << "Failed to load box image! SDL_image Error: " << IMG_GetError() << std::endl;
+        return false;
     }
+
+    boxTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
+    SDL_FreeSurface(loadedSurface);
+
+    if (!boxTexture) {
+        std::cerr << "Failed to create texture from box image! SDL Error: " << SDL_GetError() << std::endl;
+        return false;
+    }
+
+    return true;
 }
 
-void Box::render() {
-    if (texture) {
-        SDL_Rect boxRect = {x, y, size, size};
-        SDL_RenderCopy(renderer, texture, nullptr, &boxRect);
-    } else {
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); // Màu đỏ
-        SDL_Rect boxRect = {x, y, size, size};
-        SDL_RenderFillRect(renderer, &boxRect);
+void Box::render(int x, int y, int size) {
+    if (boxTexture) {
+        SDL_Rect renderQuad = {x, y, size, size};
+        SDL_RenderCopy(renderer, boxTexture, NULL, &renderQuad);
     }
-}
-
-void Box::drop() {
-    falling = true;
-    velocityY = 5;  // Bắt đầu rơi với vận tốc ban đầu
 }

@@ -1,16 +1,14 @@
 #include "game.h"
-#include <iostream>
 
 int main(int argc, char* argv[]) {
-    Game* game = new Game();
+    Game game;
 
-    if (!game->init()) {
-        std::cerr << "Failed to initialize game!" << std::endl;
-        delete game;
+    if (!game.init()) {
         return -1;
     }
 
-    game->run();
-    delete game;
+    game.run();
+    game.close();
+
     return 0;
 }

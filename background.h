@@ -3,15 +3,19 @@
 
 #include <SDL.h>
 #include <SDL_image.h>
+#include <string>
 
 class Background {
 public:
     Background(SDL_Renderer* renderer);
     ~Background();
-    void render(SDL_Renderer* renderer);
+
+    bool loadBackground(const std::string& path);
+    void render();
 
 private:
-    SDL_Texture* texture;
+    SDL_Renderer* renderer;
+    SDL_Texture* backgroundTexture;
 };
 
 #endif
