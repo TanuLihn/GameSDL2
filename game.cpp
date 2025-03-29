@@ -2,6 +2,7 @@
 #include <iostream>
 #include <sstream>
 #include <iomanip>
+#include <SDL_mixer.h>
 
 const int SCREEN_WIDTH = 600;
 const int SCREEN_HEIGHT = 700;
@@ -69,6 +70,7 @@ Game::Game() {
     totalPauseTime = 0;
     font = nullptr;
     titleFont = nullptr;
+    dropSound = nullptr;
 
     for (int i = 0; i < 7; i++)
         for (int j = 0; j < 7; j++)
@@ -97,9 +99,15 @@ void Game::initButtons() {
 }
 
 bool Game::init() {
-    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0) {
         std::cerr << "SDL could not initialize! SDL_Error: " << SDL_GetError() << std::endl;
         return false;
+    }
+
+    // Khởi tạo SDL_mixer
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+        std::cerr << "SDL_mixer could not initialize! Mix_Error: " << Mix_GetError() << std::endl;
+        // Tiếp tục mà không có âm thanh
     }
 
     if (TTF_Init() < 0) {
@@ -117,6 +125,27 @@ bool Game::init() {
     if (!renderer) {
         std::cerr << "Renderer could not be created! SDL_Error: " << SDL_GetError() << std::endl;
         return false;
+    }
+
+    // Tải hiệu ứng âm thanh khi hộp rơi
+    const char* soundPaths[] = {
+        "effect.mp3",
+        "assets/effect.mp3",
+        "sounds/effect.mp3",
+        "./data/effect.mp3"
+    };
+
+    for (const char* path : soundPaths) {
+        dropSound = Mix_LoadWAV(path);
+        if (dropSound) {
+            std::cout << "Successfully loaded sound effect: " << path << std::endl;
+            break;
+        }
+    }
+
+    if (!dropSound) {
+        std::cerr << "Failed to load drop sound effect! Mix_Error: " << Mix_GetError() << std::endl;
+        // Tiếp tục mà không có âm thanh
     }
 
     // Thử tải nhiều font khác nhau và nhiều đường dẫn khác nhau
@@ -404,6 +433,11 @@ void Game::update() {
             if (row >= 0) {
                 grid[row][col] = 1;
                 score.subtractPoints(10); // Trừ 10 điểm khi một hộp được đặt
+
+                // Phát âm thanh khi hộp rơi
+                if (dropSound) {
+                    Mix_PlayChannel(-1, dropSound, 0);
+                }
             }
 
             // Kiểm tra điều kiện kết thúc game
@@ -661,10 +695,15 @@ void Game::close() {
         TTF_CloseFont(titleFont);
     }
 
+    if (dropSound) {
+        Mix_FreeChunk(dropSound);
+    }
+
+    Mix_CloseAudio();
+
     delete background;
     delete box;
 
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
-
 }

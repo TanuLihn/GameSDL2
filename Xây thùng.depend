@@ -2,9 +2,10 @@
 1743244812 source:c:\code block\xây thùng\main.cpp
 	"game.h"
 
-1743253037 c:\code block\xây thùng\game.h
+1743264860 c:\code block\xây thùng\game.h
 	<SDL.h>
 	<SDL_ttf.h>
+	<SDL_mixer.h>
 	<string>
 	<vector>
 	"background.h"
@@ -20,20 +21,22 @@
 
 1743248700 c:\code block\xây thùng\win_level.h
 
-1743244812 c:\code block\xây thùng\box.h
+1743264738 c:\code block\xây thùng\box.h
 	<SDL.h>
 	<SDL_image.h>
 	<string>
+	<SDL_mixer.h>
 
 1743249329 c:\code block\xây thùng\score.h
 
 1743248700 c:\code block\xây thùng\highscore.h
 
-1743253059 source:c:\code block\xây thùng\game.cpp
+1743264738 source:c:\code block\xây thùng\game.cpp
 	"game.h"
 	<iostream>
 	<sstream>
 	<iomanip>
+	<SDL_mixer.h>
 
 1743244812 source:c:\code block\xây thùng\background.cpp
 	"background.h"

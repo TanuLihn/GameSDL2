@@ -4,6 +4,7 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <string>
+#include <SDL_mixer.h>
 
 class Box {
 public:
@@ -16,6 +17,7 @@ public:
 private:
     SDL_Renderer* renderer;
     SDL_Texture* boxTexture;
+    Mix_Chunk* dropSound;
 };
 
 #endif
