@@ -7,8 +7,9 @@ private:
 public:
     Score();
     void addPoints(int points);
+    void subtractPoints(int points);
     int getScore() const;
-    void reset();
+    void reset(int initialScore = 0);
 };
 
 #endif

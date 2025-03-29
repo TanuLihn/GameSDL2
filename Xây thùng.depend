@@ -2,40 +2,55 @@
 1743244812 source:c:\code block\xây thùng\main.cpp
 	"game.h"
 
-1743244812 c:\code block\xây thùng\game.h
+1743253037 c:\code block\xây thùng\game.h
 	<SDL.h>
+	<SDL_ttf.h>
+	<string>
+	<vector>
 	"background.h"
 	"box.h"
+	"score.h"
+	"highscore.h"
+	"win_level.h"
 
 1743244812 c:\code block\xây thùng\background.h
 	<SDL.h>
 	<SDL_image.h>
 	<string>
 
-1742813164 c:\code block\xây thùng\win_level.h
+1743248700 c:\code block\xây thùng\win_level.h
 
 1743244812 c:\code block\xây thùng\box.h
 	<SDL.h>
 	<SDL_image.h>
 	<string>
 
-1742344522 c:\code block\xây thùng\score.h
+1743249329 c:\code block\xây thùng\score.h
 
-1742344566 c:\code block\xây thùng\highscore.h
-	<vector>
-	<string>
-	<fstream>
-	<iostream>
-	<algorithm>
+1743248700 c:\code block\xây thùng\highscore.h
 
-1743244812 source:c:\code block\xây thùng\game.cpp
+1743250800 source:c:\code block\xây thùng\game.cpp
 	"game.h"
 	<iostream>
+	<sstream>
+	<iomanip>
 
 1743244812 source:c:\code block\xây thùng\background.cpp
 	"background.h"
 	<iostream>
 
-1743042196 source:c:\code block\xây thùng\win_level.cpp
+1743249329 source:c:\code block\xây thùng\win_level.cpp
 	"win_level.h"
+
+1743244812 source:c:\code block\xây thùng\box.cpp
+	"box.h"
+	<iostream>
+
+1743249329 source:c:\code block\xây thùng\score.cpp
+	"score.h"
+
+1743248700 source:c:\code block\xây thùng\highscore.cpp
+	"highscore.h"
+	<iostream>
+	<fstream>
 
