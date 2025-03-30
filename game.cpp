@@ -6,9 +6,8 @@
 
 const int SCREEN_WIDTH = 600;
 const int SCREEN_HEIGHT = 700;
-const int GRID_SIZE = SCREEN_WIDTH / 7;  // Kích thước mỗi ô lưới
+const int GRID_SIZE = SCREEN_WIDTH / 7;
 
-// Button class implementation
 Button::Button(int x, int y, int w, int h, const std::string& text)
     : rect{x, y, w, h}, text(text), hover(false) {}
 
@@ -18,19 +17,14 @@ bool Button::isMouseOver(int mouseX, int mouseY) const {
 }
 
 void Button::render(SDL_Renderer* renderer, TTF_Font* font) {
-    // Draw button background
     if (hover) {
-        SDL_SetRenderDrawColor(renderer, 100, 100, 255, 255); // Highlighted color
+        SDL_SetRenderDrawColor(renderer, 100, 100, 255, 255);
     } else {
-        SDL_SetRenderDrawColor(renderer, 70, 70, 200, 255); // Normal color
+        SDL_SetRenderDrawColor(renderer, 70, 70, 200, 255);
     }
     SDL_RenderFillRect(renderer, &rect);
-
-    // Draw button border
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     SDL_RenderDrawRect(renderer, &rect);
-
-    // Render text if font is available
     if (font) {
         SDL_Color textColor = {255, 255, 255, 255};
         SDL_Surface* textSurface = TTF_RenderUTF8_Solid(font, text.c_str(), textColor);
@@ -51,7 +45,6 @@ void Button::render(SDL_Renderer* renderer, TTF_Font* font) {
     }
 }
 
-// Game class implementation
 Game::Game() {
     window = nullptr;
     renderer = nullptr;
@@ -75,8 +68,6 @@ Game::Game() {
     for (int i = 0; i < 7; i++)
         for (int j = 0; j < 7; j++)
             grid[i][j] = 0;
-
-    // Khởi tạo điểm số với 1000 điểm
     score.reset(1000);
 }
 
@@ -85,12 +76,9 @@ Game::~Game() {
 }
 
 void Game::initButtons() {
-    // Menu buttons
     menuButtons.clear();
     menuButtons.push_back(Button(SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2, 200, 50, "Chơi"));
     menuButtons.push_back(Button(SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2 + 70, 200, 50, "Hướng dẫn"));
-
-    // Difficulty buttons
     difficultyButtons.clear();
     difficultyButtons.push_back(Button(SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2 - 80, 200, 50, "Dễ"));
     difficultyButtons.push_back(Button(SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2, 200, 50, "Trung Bình"));
@@ -103,11 +91,8 @@ bool Game::init() {
         std::cerr << "SDL could not initialize! SDL_Error: " << SDL_GetError() << std::endl;
         return false;
     }
-
-    // Khởi tạo SDL_mixer
     if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
         std::cerr << "SDL_mixer could not initialize! Mix_Error: " << Mix_GetError() << std::endl;
-        // Tiếp tục mà không có âm thanh
     }
 
     if (TTF_Init() < 0) {
@@ -126,8 +111,6 @@ bool Game::init() {
         std::cerr << "Renderer could not be created! SDL_Error: " << SDL_GetError() << std::endl;
         return false;
     }
-
-    // Tải hiệu ứng âm thanh khi hộp rơi
     const char* soundPaths[] = {
         "effect.mp3",
         "assets/effect.mp3",
@@ -145,10 +128,7 @@ bool Game::init() {
 
     if (!dropSound) {
         std::cerr << "Failed to load drop sound effect! Mix_Error: " << Mix_GetError() << std::endl;
-        // Tiếp tục mà không có âm thanh
     }
-
-    // Thử tải nhiều font khác nhau và nhiều đường dẫn khác nhau
     const char* fontPaths[] = {
         "font.ttf",
         "assets/font.ttf",
@@ -175,7 +155,6 @@ bool Game::init() {
     if (!font) {
         std::cerr << "Failed to load any font! TTF_Error: " << TTF_GetError() << std::endl;
         std::cerr << "Will use alternate rendering method for text" << std::endl;
-        // Tiếp tục mà không có font - sẽ sử dụng phương pháp thay thế
     }
 
     background = new Background(renderer);
@@ -194,7 +173,6 @@ void Game::renderText(const std::string& text, int x, int y, SDL_Color color, TT
     TTF_Font* fontToUse = customFont ? customFont : font;
 
     if (fontToUse) {
-        // Render text sử dụng font nếu có
         SDL_Surface* textSurface = TTF_RenderUTF8_Solid(fontToUse, text.c_str(), color);
         if (!textSurface) {
             std::cerr << "Unable to render text surface! TTF_Error: " << TTF_GetError() << std::endl;
@@ -214,7 +192,6 @@ void Game::renderText(const std::string& text, int x, int y, SDL_Color color, TT
 
         SDL_FreeSurface(textSurface);
     } else {
-        // Sử dụng phương pháp thay thế nếu không có font
         renderTextAlternative(text, x, y, color);
     }
 }
@@ -223,33 +200,19 @@ void Game::renderTextAlternative(const std::string& text, int x, int y, SDL_Colo
     int charWidth = 10;
     int charHeight = 20;
     int textWidth = static_cast<int>(text.length() * charWidth);
-
-    // Tạo hình chữ nhật nền với viền
     SDL_Rect backgroundRect = {x - 5, y - 5, textWidth + 10, charHeight + 10};
-
-    // Lưu màu hiện tại
     Uint8 r, g, b, a;
     SDL_GetRenderDrawColor(renderer, &r, &g, &b, &a);
-
-    // Vẽ nền
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 200); // Nền tối mờ
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 200);
     SDL_RenderFillRect(renderer, &backgroundRect);
-
-    // Vẽ viền
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); // Viền trắng
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     SDL_RenderDrawRect(renderer, &backgroundRect);
-
-    // Vẽ text (dưới dạng hình chữ nhật nhỏ)
     SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
-
-    // Vẽ các "ký tự" giả như các dấu gạch ngang
     SDL_Rect charRect = {x, y, charWidth - 2, charHeight - 10};
     for (size_t i = 0; i < text.length(); i++) {
         charRect.x = x + i * charWidth;
         SDL_RenderFillRect(renderer, &charRect);
     }
-
-    // Khôi phục màu vẽ trước đó
     SDL_SetRenderDrawColor(renderer, r, g, b, a);
 }
 
@@ -262,7 +225,7 @@ void Game::run() {
         }
 
         render();
-        SDL_Delay(16);  // Khoảng 60fps
+        SDL_Delay(16);
     }
 }
 
@@ -309,11 +272,11 @@ void Game::handleDifficultySelectEvents(SDL_Event& event) {
         for (size_t i = 0; i < difficultyButtons.size(); i++) {
             if (difficultyButtons[i].isMouseOver(mouseX, mouseY)) {
                 if (difficultyButtons[i].getText() == "Dễ") {
-                    startGame(2); // Easy speed multiplier
+                    startGame(2);
                 } else if (difficultyButtons[i].getText() == "Trung Bình") {
-                    startGame(3); // Medium speed multiplier
+                    startGame(3);
                 } else if (difficultyButtons[i].getText() == "Khó") {
-                    startGame(5); // Hard speed multiplier
+                    startGame(5);
                 } else if (difficultyButtons[i].getText() == "Quay lại") {
                     gameState = MENU;
                 }
@@ -328,8 +291,6 @@ void Game::handleEvents() {
         if (event.type == SDL_QUIT) {
             isRunning = false;
         }
-
-        // Handle key presses globally
         if (event.type == SDL_KEYDOWN) {
             switch (event.key.keysym.sym) {
                 case SDLK_ESCAPE:
@@ -343,8 +304,6 @@ void Game::handleEvents() {
                     break;
             }
         }
-
-        // Handle state-specific events
         switch (gameState) {
             case MENU:
                 handleMenuEvents(event);
@@ -405,7 +364,6 @@ void Game::handleEvents() {
 }
 
 void Game::update() {
-    // Calculate current game time (subtracting pause time)
     if (gameState == PLAYING) {
         gameTime = SDL_GetTicks() - startTime - totalPauseTime;
     }
@@ -432,15 +390,11 @@ void Game::update() {
 
             if (row >= 0) {
                 grid[row][col] = 1;
-                score.subtractPoints(10); // Trừ 10 điểm khi một hộp được đặt
-
-                // Phát âm thanh khi hộp rơi
+                score.subtractPoints(10);
                 if (dropSound) {
                     Mix_PlayChannel(-1, dropSound, 0);
                 }
             }
-
-            // Kiểm tra điều kiện kết thúc game
             if (checkGameOver(grid)) {
                 gameState = GAME_OVER;
                 highScore.saveHighScore(gameTime);
@@ -467,47 +421,32 @@ std::string Game::formatTime(Uint32 timeInMs) const {
 }
 
 void Game::renderMenu() {
-    // Draw background
     background->render();
-
-    // Draw title
     SDL_Color titleColor = {0, 0, 0, 255};
     if (titleFont) {
         renderText("Build The Box", SCREEN_WIDTH/2 - 150, SCREEN_HEIGHT/4, titleColor, titleFont);
     } else {
         renderText("Build The Box", SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/4, titleColor);
     }
-
-    // Draw buttons
     for (auto& button : menuButtons) {
         button.render(renderer, font);
     }
 }
 
 void Game::renderDifficultySelect() {
-    // Draw background
     background->render();
-
-    // Draw title
-    SDL_Color titleColor = {0, 0, 0, 255}; // Yellow
+    SDL_Color titleColor = {0, 0, 0, 255};
     renderText("Chọn độ khó", SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/4, titleColor);
-
-    // Draw buttons
     for (auto& button : difficultyButtons) {
         button.render(renderer, font);
     }
 }
 
 void Game::renderInstructions() {
-    // Draw background
     background->render();
-
-    // Draw title
-    SDL_Color titleColor = {255, 255, 0, 255}; // Yellow
+    SDL_Color titleColor = {255, 255, 0, 255};
     renderText("Hướng dẫn", SCREEN_WIDTH/2 - 80, 50, titleColor);
-
-    // Draw instructions
-    SDL_Color textColor = {0, 0, 0, 255}; // White
+    SDL_Color textColor = {0, 0, 0, 255};
     std::vector<std::string> instructions = {
         "Nhiệm vụ của bạn là cố gắng sắp xếp các hộp",
         "sao cho có 1 cột đạt 7 hộp hoặc 1 hàng đạt",
@@ -532,14 +471,11 @@ void Game::renderInstructions() {
 }
 
 void Game::renderGame() {
-    // Vẽ lưới
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     for (int i = 0; i <= 7; i++) {
         SDL_RenderDrawLine(renderer, i * GRID_SIZE, 0, i * GRID_SIZE, SCREEN_WIDTH);
         SDL_RenderDrawLine(renderer, 0, i * GRID_SIZE, SCREEN_WIDTH, i * GRID_SIZE);
     }
-
-    // Vẽ các ô đã xếp
     for (int i = 0; i < 7; i++) {
         for (int j = 0; j < 7; j++) {
             if (grid[i][j] == 1) {
@@ -547,27 +483,17 @@ void Game::renderGame() {
             }
         }
     }
-
-    // Vẽ ô đang di chuyển
     box->render(boxX, boxY, GRID_SIZE);
-
-    // Hiển thị thông tin game với màu dễ nhìn hơn
-    SDL_Color textColor = {255, 255, 0, 255}; // Màu vàng cho text
-
-    // Hiển thị điểm ở góc dưới bên phải
+    SDL_Color textColor = {255, 255, 0, 255};
     std::stringstream scoreText;
     scoreText << "Điểm: " << score.getScore();
-    int scoreWidth = 150; // Giá trị mặc định nếu không có font
+    int scoreWidth = 150;
     int scoreHeight = 30;
     if (font) {
         TTF_SizeUTF8(font, scoreText.str().c_str(), &scoreWidth, &scoreHeight);
     }
     renderText(scoreText.str(), SCREEN_WIDTH - scoreWidth - 20, SCREEN_HEIGHT - scoreHeight - 20, textColor);
-
-    // Hiển thị đồng hồ bấm giờ ở góc dưới bên trái
     renderText("Thời gian: " + formatTime(gameTime), 20, SCREEN_HEIGHT - scoreHeight - 20, textColor);
-
-    // Hiển thị high score ở phía trên
     std::stringstream highScoreText;
     highScoreText << "Thời gian tốt nhất: ";
     if (highScore.getHighScore() != -1) {
@@ -579,20 +505,13 @@ void Game::renderGame() {
 }
 
 void Game::renderGameOver() {
-    // Vẽ một hình chữ nhật bán trong suốt làm nền cho thông báo
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 200);
     SDL_Rect overlay = {SCREEN_WIDTH / 4, SCREEN_HEIGHT / 3, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 3};
     SDL_RenderFillRect(renderer, &overlay);
-
-    // Vẽ viền cho hình chữ nhật
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     SDL_RenderDrawRect(renderer, &overlay);
-
-    // Sử dụng màu đỏ cho thông báo kết thúc
     SDL_Color gameOverColor = {255, 0, 0, 255};
     renderText("KẾT THÚC!", SCREEN_WIDTH / 2 - 80, SCREEN_HEIGHT / 2 - 80, gameOverColor);
-
-    // Hiển thị thời gian và điểm số
     SDL_Color textColor = {255, 255, 0, 255};
 
     std::stringstream finalTimeText;
@@ -602,31 +521,21 @@ void Game::renderGameOver() {
     std::stringstream finalScoreText;
     finalScoreText << "Điểm cuối: " << score.getScore();
     renderText(finalScoreText.str(), SCREEN_WIDTH / 2 - 80, SCREEN_HEIGHT / 2 + 10, textColor);
-
-    // Sử dụng màu trắng cho hướng dẫn
     SDL_Color instructionColor = {255, 255, 255, 255};
     renderText("Nhấn SPACE để quay lại menu", SCREEN_WIDTH / 2 - 120, SCREEN_HEIGHT / 2 + 50, instructionColor);
 }
 
 void Game::renderPaused() {
-    // Vẽ một hình chữ nhật bán trong suốt làm nền cho thông báo tạm dừng
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 150);
     SDL_Rect overlay = {SCREEN_WIDTH / 4, SCREEN_HEIGHT / 3, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 6};
     SDL_RenderFillRect(renderer, &overlay);
-
-    // Vẽ viền
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     SDL_RenderDrawRect(renderer, &overlay);
-
-    // Tính toán vị trí chính xác cho text để căn giữa
     int textWidth = 0;
     int textHeight = 0;
-
-    // Sử dụng màu xanh cho thông báo tạm dừng
     SDL_Color pauseColor = {0, 255, 255, 255};
     std::string pauseText = "TẠM DỪNG";
 
-    // Tính kích thước text nếu có font
     if (font) {
         TTF_SizeUTF8(font, pauseText.c_str(), &textWidth, &textHeight);
         renderText(pauseText,
@@ -634,14 +543,11 @@ void Game::renderPaused() {
                   overlay.y + 20,
                   pauseColor);
     } else {
-        // Nếu không có font, sử dụng vị trí ước lượng
         renderText(pauseText,
                   SCREEN_WIDTH / 2 - 60,
                   overlay.y + 20,
                   pauseColor);
     }
-
-    // Tương tự cho text hướng dẫn
     SDL_Color textColor = {255, 255, 0, 255};
     std::string continueText = "Nhấn P để tiếp tục";
 
@@ -705,7 +611,6 @@ void Game::startGame(int difficulty) {
 }
 
 void Game::resetGame() {
-    // Làm trống lưới
     for (int i = 0; i < 7; i++)
         for (int j = 0; j < 7; j++)
             grid[i][j] = 0;
@@ -715,7 +620,7 @@ void Game::resetGame() {
     isFalling = false;
     direction = true;
 
-    score.reset(1000); // Đặt lại điểm số thành 1000
+    score.reset(1000);
     gameTime = 0;
 }
 
