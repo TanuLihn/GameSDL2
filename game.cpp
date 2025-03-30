@@ -471,7 +471,7 @@ void Game::renderMenu() {
     background->render();
 
     // Draw title
-    SDL_Color titleColor = {255, 255, 0, 255}; // Yellow
+    SDL_Color titleColor = {0, 0, 0, 255};
     if (titleFont) {
         renderText("Build The Box", SCREEN_WIDTH/2 - 150, SCREEN_HEIGHT/4, titleColor, titleFont);
     } else {
@@ -489,7 +489,7 @@ void Game::renderDifficultySelect() {
     background->render();
 
     // Draw title
-    SDL_Color titleColor = {255, 255, 0, 255}; // Yellow
+    SDL_Color titleColor = {0, 0, 0, 255}; // Yellow
     renderText("Chọn độ khó", SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/4, titleColor);
 
     // Draw buttons
@@ -507,7 +507,7 @@ void Game::renderInstructions() {
     renderText("Hướng dẫn", SCREEN_WIDTH/2 - 80, 50, titleColor);
 
     // Draw instructions
-    SDL_Color textColor = {255, 255, 255, 255}; // White
+    SDL_Color textColor = {0, 0, 0, 255}; // White
     std::vector<std::string> instructions = {
         "Nhiệm vụ của bạn là cố gắng sắp xếp các hộp",
         "sao cho có 1 cột đạt 7 hộp hoặc 1 hàng đạt",
@@ -618,12 +618,45 @@ void Game::renderPaused() {
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     SDL_RenderDrawRect(renderer, &overlay);
 
+    // Tính toán vị trí chính xác cho text để căn giữa
+    int textWidth = 0;
+    int textHeight = 0;
+
     // Sử dụng màu xanh cho thông báo tạm dừng
     SDL_Color pauseColor = {0, 255, 255, 255};
-    renderText("TẠM DỪNG", SCREEN_WIDTH / 2 - 60, SCREEN_HEIGHT / 2 - 30, pauseColor);
+    std::string pauseText = "TẠM DỪNG";
 
+    // Tính kích thước text nếu có font
+    if (font) {
+        TTF_SizeUTF8(font, pauseText.c_str(), &textWidth, &textHeight);
+        renderText(pauseText,
+                  overlay.x + (overlay.w - textWidth) / 2,
+                  overlay.y + 20,
+                  pauseColor);
+    } else {
+        // Nếu không có font, sử dụng vị trí ước lượng
+        renderText(pauseText,
+                  SCREEN_WIDTH / 2 - 60,
+                  overlay.y + 20,
+                  pauseColor);
+    }
+
+    // Tương tự cho text hướng dẫn
     SDL_Color textColor = {255, 255, 0, 255};
-    renderText("Nhấn P để tiếp tục", SCREEN_WIDTH / 2 - 90, SCREEN_HEIGHT / 2, textColor);
+    std::string continueText = "Nhấn P để tiếp tục";
+
+    if (font) {
+        TTF_SizeUTF8(font, continueText.c_str(), &textWidth, &textHeight);
+        renderText(continueText,
+                  overlay.x + (overlay.w - textWidth) / 2,
+                  overlay.y + overlay.h - textHeight - 20,
+                  textColor);
+    } else {
+        renderText(continueText,
+                  SCREEN_WIDTH / 2 - 90,
+                  overlay.y + overlay.h - 30,
+                  textColor);
+    }
 }
 
 void Game::render() {
